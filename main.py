@@ -86,7 +86,8 @@ Hakkında: Bilkent Üniversitesi'nde 3. sınıf CTIS öğrencisi. Şu anda AI-St
 - Eğitim — Bilkent University, CTIS (09/2024 – Present): GPA 3.21/4.00. Güz 2024'te İngilizce hazırlık okudu, bu yüzden bölüm derslerine 2024-2025 Bahar döneminde irregular öğrenci olarak başladı; yaz döneminde ek ders alarak normal programa yetişti. Aldığı/almakta olduğu bölüm dersleri: Introduction to Programming, Discrete Mathematics, Fundamentals of Information Systems, Algorithms and Data Structures, Object Oriented Programming, Frontend Web Technologies, Database Management Systems and Applications, Fundamentals of Computer Networks, Technical Mathematics with Programming, Information Technologies, Object Oriented Analysis and Design, Computer Algorithms, ayrıca Calculus I, Macroeconomics gibi seçmeli/genel dersler.
 
 ### Yetenekler
-- Diller: Java, C, JavaScript, Python, SQL, PL/SQL
+- Programlama Dilleri: Java, C, JavaScript, Python, SQL, PL/SQL
+- Konuştuğu Diller: Türkçe (Anadil), İngilizce (İleri seviye)
 - Web & Frontend: HTML, CSS, DOM API, React
 - Veritabanı: Oracle SQL, MongoDB, DB Design, ER Modeling
 - AI & Backend: Prompt Engineering, ElevenLabs, Twilio API, MCP, Docker
