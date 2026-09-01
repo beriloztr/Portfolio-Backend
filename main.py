@@ -21,8 +21,8 @@ supabase: Client = create_client(
 )
 
 MAX_HISTORY_MESSAGES = 16  # cap conversation length sent per request
-MAX_MESSAGES_PER_IP = 3  # TEMP for testing, will revert to 15
-WARN_AT_MESSAGE_COUNT = 2  # TEMP for testing, will revert to 10
+MAX_MESSAGES_PER_IP = 12
+WARN_AT_MESSAGE_COUNT = 8
 message_counts_by_ip = defaultdict(int)
 
 #React -> CORS -> Backend (security check)
