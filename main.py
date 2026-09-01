@@ -28,7 +28,7 @@ message_counts_by_ip = defaultdict(int)
 #React -> CORS -> Backend (security check)
 ALLOWED_ORIGINS = [
     "http://localhost:5173",  # local Vite dev server
-    # TODO: add the production frontend URL here once deployed, e.g. "https://berilozturk.com"
+    "https://beril-bozturk.vercel.app",  # production frontend (Vercel)
 ]
 
 app.add_middleware(
