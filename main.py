@@ -1,5 +1,6 @@
 import os
 import re
+import time
 import uuid
 from collections import defaultdict
 from typing import Literal, Optional
@@ -23,7 +24,25 @@ supabase: Client = create_client(
 MAX_HISTORY_MESSAGES = 16  # cap conversation length sent per request
 MAX_MESSAGES_PER_IP = 12
 WARN_AT_MESSAGE_COUNT = 8
-message_counts_by_ip = defaultdict(int)
+RATE_LIMIT_WINDOW_SECONDS = 24 * 60 * 60  # counters reset 24h after an IP's first message in the window
+message_counts_by_ip: dict[str, list[float]] = defaultdict(lambda: [0, 0.0])  # ip -> [count, window_start_ts]
+
+
+def get_message_count(client_ip: str) -> int:
+    count, window_start = message_counts_by_ip[client_ip]
+    if time.time() - window_start >= RATE_LIMIT_WINDOW_SECONDS:
+        return 0
+    return count
+
+
+def increment_message_count(client_ip: str) -> int:
+    count, window_start = message_counts_by_ip[client_ip]
+    now = time.time()
+    if now - window_start >= RATE_LIMIT_WINDOW_SECONDS:
+        count, window_start = 0, now
+    count += 1
+    message_counts_by_ip[client_ip] = [count, window_start]
+    return count
 
 #React -> CORS -> Backend (security check)
 ALLOWED_ORIGINS = [
@@ -125,13 +144,12 @@ async def chat_endpoint(request: ChatRequest, http_request: Request):
     client_ip = http_request.client.host
     if client_ip in ("::1", "localhost"):
         client_ip = "127.0.0.1"  # normalize IPv6/IPv4 localhost so local testing doesn't split the counter
-    if message_counts_by_ip[client_ip] >= MAX_MESSAGES_PER_IP:
+    if get_message_count(client_ip) >= MAX_MESSAGES_PER_IP:
         raise HTTPException(
             status_code=429,
             detail="You've reached the message limit for this session. Please reach out via email instead: oztr.beril@gmail.com",
         )
-    message_counts_by_ip[client_ip] += 1
-    current_count = message_counts_by_ip[client_ip]
+    current_count = increment_message_count(client_ip)
     limit_reached = current_count >= MAX_MESSAGES_PER_IP
 
     if limit_reached:
@@ -179,7 +197,7 @@ async def chat_endpoint(request: ChatRequest, http_request: Request):
 
     except Exception as e:
         print(f"GROQ ERROR: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Something went wrong. Please try again later.")
 
 @app.get("/")
 def read_root():
