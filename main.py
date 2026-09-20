@@ -48,6 +48,7 @@ def increment_message_count(client_ip: str) -> int:
 ALLOWED_ORIGINS = [
     "http://localhost:5173",  # local Vite dev server
     "https://beril-bozturk.vercel.app",  # production frontend (Vercel)
+    "https://beril-oztr.vercel.app",  # production frontend (Vercel, current domain)
 ]
 
 app.add_middleware(
