@@ -139,9 +139,19 @@ Hakkında: Bilkent Üniversitesi'nde 3. sınıf CTIS öğrencisi. Şu anda AI-St
 
 SECTION_TAG_RE = re.compile(r"\[\[section:(about|skills|experience|projects|contact)\]\]", re.IGNORECASE)
 
+def get_client_ip(http_request: Request) -> str:
+    # Render (and most PaaS proxies) terminate TLS in front of the app, so
+    # http_request.client.host is the proxy's IP, not the visitor's — that
+    # would bucket every visitor into one shared rate-limit counter.
+    forwarded_for = http_request.headers.get("x-forwarded-for")
+    if forwarded_for:
+        return forwarded_for.split(",")[0].strip()
+    return http_request.client.host
+
+
 @app.post("/chat")
 async def chat_endpoint(request: ChatRequest, http_request: Request):
-    client_ip = http_request.client.host
+    client_ip = get_client_ip(http_request)
     if client_ip in ("::1", "localhost"):
         client_ip = "127.0.0.1"  # normalize IPv6/IPv4 localhost so local testing doesn't split the counter
     if get_message_count(client_ip) >= MAX_MESSAGES_PER_IP:
@@ -202,3 +212,15 @@ async def chat_endpoint(request: ChatRequest, http_request: Request):
 @app.get("/")
 def read_root():
     return {"status": "Backend is running securely."}
+
+@app.get("/health")
+def health_check():
+    # Touches Supabase so scheduled keep-alive pings count as real API
+    # activity and the free-tier project doesn't get auto-paused.
+    try:
+        supabase.table("chat_logs").select("id").limit(1).execute()
+        supabase_ok = True
+    except Exception as e:
+        print(f"SUPABASE HEALTH CHECK ERROR: {e}")
+        supabase_ok = False
+    return {"status": "ok", "supabase_ok": supabase_ok}
