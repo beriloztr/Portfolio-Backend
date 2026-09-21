@@ -22,8 +22,8 @@ supabase: Client = create_client(
 )
 
 MAX_HISTORY_MESSAGES = 16  # cap conversation length sent per request
-MAX_MESSAGES_PER_IP = 12
-WARN_AT_MESSAGE_COUNT = 8
+MAX_MESSAGES_PER_IP = 10
+WARN_AT_MESSAGE_COUNT = 7
 RATE_LIMIT_WINDOW_SECONDS = 24 * 60 * 60  # counters reset 24h after an IP's first message in the window
 message_counts_by_ip: dict[str, list[float]] = defaultdict(lambda: [0, 0.0])  # ip -> [count, window_start_ts]
 
